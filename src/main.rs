@@ -21,13 +21,20 @@ enum Args {
     /// Check if you need migration
     Check(CheckArgs),
 
-    /// Do migration if you need to
-    /// /!\ need the last version of db before being able to use /!\
+    /// Do migration
     Migrate(MigrateArgs),
+
+    /// Init custom config file
+    InitConfig(InitConfigArgs),
 }
 
 #[derive(Parser)]
 struct InitArgs {}
+#[derive(Parser)]
+struct InitConfigArgs {
+    #[arg(default_value = "default")]
+    config: String,
+}
 #[derive(Parser)]
 struct SetupArgs {}
 #[derive(Parser)]
@@ -136,6 +143,21 @@ fn main() {
                     serde_json::to_string_pretty(&conf).unwrap(),
                 );
                 println!("Folders structure created !");
+            }
+        }
+        Args::InitConfig(e) => {
+            if !is_project_folder_inited() {
+                return println!("This folder is not inited");
+            }
+            if !something_exist(&(get_current_working_dir() + "/migrust/" + &e.config + ".json"))
+            {
+                let conf = get_project_config(&e.config);
+                let _ = write(
+                    &(get_current_working_dir() + "/migrust/" + &e.config + ".json"),
+                    serde_json::to_string_pretty(&conf).unwrap(),
+                );
+            } else {
+                println!("Config file already exist !");
             }
         }
         Args::Check(e) => {
