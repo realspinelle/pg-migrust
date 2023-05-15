@@ -1,12 +1,12 @@
 use clap::Parser;
 use directories::ProjectDirs;
+use rand::Rng;
 use serde_derive::{Deserialize, Serialize};
 use std::fs::{self, create_dir_all, write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::{Context, Timestamp, Uuid};
-use rand::Rng;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -73,9 +73,9 @@ fn file_modified_time_in_millis(path: &str) -> u128 {
 }
 
 fn is_project_folder_inited() -> bool {
-    something_exist(&(get_current_working_dir() + "/migrust/backup"))
+    something_exist(&(get_current_working_dir() + "/migrust"))
+        && something_exist(&(get_current_working_dir() + "/migrust/backup"))
         && something_exist(&(get_current_working_dir() + "/migrust/migrations"))
-        && something_exist(&(get_current_working_dir() + "/migrust/default.json"))
 }
 
 fn get_project_config(config_name: &str) -> ProjectConfig {
@@ -159,6 +159,9 @@ fn main() {
             if !is_project_folder_inited() {
                 return println!("This folder is not inited");
             }
+            if !something_exist(&(get_current_working_dir() + "/migrust/" + &e.config + ".json")) {
+                return println!("Selected config dont exist");
+            }
             let project_config = get_project_config(e.config.as_str());
             let config = get_config(
                 &proj_dirs.config_dir().to_str().unwrap(),
@@ -187,6 +190,9 @@ fn main() {
         Args::Migrate(e) => {
             if !is_project_folder_inited() {
                 return println!("This folder is not inited");
+            }
+            if !something_exist(&(get_current_working_dir() + "/migrust/" + &e.config + ".json")) {
+                return println!("Selected config dont exist");
             }
             let project_config = get_project_config(e.config.as_str());
             let config = get_config(
