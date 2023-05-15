@@ -1,7 +1,7 @@
 {
   "name": "pg-migrust",
-  "version": "0.1.0",
-  
+  "version": "0.1.1",
+  "description": "Very simple postgress database migration tool written in rust",
   "main": "start.js",
   "directories": {
     "test": "tests"
@@ -13,7 +13,7 @@
   },
   "keywords": [],
   
-  "license": "ISC",
+  "license": "MIT",
   "files": [
     "pre-install.js",
     "start.js",

@@ -5,8 +5,8 @@ use std::fs::{self, create_dir_all, write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
-use uuid::ClockSequence;
 use uuid::{Context, Timestamp, Uuid};
+use rand::Rng;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -86,15 +86,11 @@ fn get_project_config(config_name: &str) -> ProjectConfig {
         )
         .unwrap()
     } else {
+        let mut rng = rand::thread_rng();
+        let context = Context::new(rng.gen());
+        let ts = Timestamp::from_unix(&context, 1497624119, 1234);
         ProjectConfig {
-            id: Uuid::new_v1(
-                Timestamp::from_rfc4122(
-                    14976234442241191232,
-                    Context::new(42).generate_sequence(0, 0),
-                ),
-                &[1, 2, 3, 4, 5, 6],
-            )
-            .to_string(),
+            id: Uuid::new_v1(ts, &[1, 2, 3, 4, 5, 6]).to_string(),
             db: DB {
                 database: "".to_string(),
                 host: "".to_string(),
@@ -149,8 +145,7 @@ fn main() {
             if !is_project_folder_inited() {
                 return println!("This folder is not inited");
             }
-            if !something_exist(&(get_current_working_dir() + "/migrust/" + &e.config + ".json"))
-            {
+            if !something_exist(&(get_current_working_dir() + "/migrust/" + &e.config + ".json")) {
                 let conf = get_project_config(&e.config);
                 let _ = write(
                     &(get_current_working_dir() + "/migrust/" + &e.config + ".json"),
