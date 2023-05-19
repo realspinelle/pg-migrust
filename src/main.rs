@@ -110,10 +110,7 @@ fn get_config(path: &str, config_name: &str) -> Config {
         .unwrap()
     } else {
         Config {
-            time: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_millis(),
+            time: 0,
         }
     }
 }
