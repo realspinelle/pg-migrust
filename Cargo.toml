@@ -1,6 +1,6 @@
 [package]
 name = "pg-migrust"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Very simple postgress database migration tool written in rust"
 license = "MIT"
