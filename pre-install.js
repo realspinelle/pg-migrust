@@ -29,8 +29,8 @@ if (fs.existsSync(cargoDir)) {
     
 const features = process.env.npm_config_features ? `--features ${process.env.npm_config_features.replace(",", " ")}` : ""; 
 
-console.log(`Installing and compiling pg-migrust 0.1.7 ${features} ...`);
-exec(`cargo install pg-migrust --vers 0.1.7 ${features}`, (error, stdout, stderr) => {
+console.log(`Installing and compiling pg-migrust 0.1.8 ${features} ...`);
+exec(`cargo install pg-migrust --vers 0.1.8 ${features}`, (error, stdout, stderr) => {
   console.log(stdout);
   if (error || stderr) {
     console.log(error || stderr);
