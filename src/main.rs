@@ -128,7 +128,7 @@ fn main() {
                 .as_millis()
                 .to_string() + ".sql";
                 let _ = write(
-                    &filename,
+                    &(get_current_working_dir() + "/migrust/migrations" + &filename),
                     "",
                 );
                 println!("File {} created", filename);
