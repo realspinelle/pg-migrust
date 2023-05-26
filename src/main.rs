@@ -26,8 +26,13 @@ enum Args {
 
     /// Init custom config file
     InitConfig(InitConfigArgs),
+
+    /// Create a migration file
+    Create(CreateArgs),
 }
 
+#[derive(Parser)]
+struct CreateArgs {}
 #[derive(Parser)]
 struct InitArgs {}
 #[derive(Parser)]
@@ -60,16 +65,6 @@ fn get_current_working_dir() -> String {
 fn something_exist(path: &str) -> bool {
     let path = Path::new(path);
     path.is_dir() || path.is_file()
-}
-
-fn file_modified_time_in_millis(path: &str) -> u128 {
-    fs::metadata(path)
-        .unwrap()
-        .created()
-        .unwrap()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis()
 }
 
 fn is_project_folder_inited() -> bool {
@@ -123,6 +118,22 @@ fn main() {
         let _ = create_dir_all(proj_dirs.config_dir().to_str().unwrap());
     };
     match args {
+        Args::Create(_) => {
+            if is_project_folder_inited() {
+                return println!("This folder is not inited");
+            } else {
+                let filename = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis()
+                .to_string() + ".sql";
+                let _ = write(
+                    &filename,
+                    "",
+                );
+                println!("File {} created", filename);
+            }
+        }
         Args::Init(_) => {
             if is_project_folder_inited() {
                 return println!("Migrust is already inited in this project");
@@ -171,11 +182,7 @@ fn main() {
                     .map(|x| x.map(|entry| entry.path()).unwrap())
                     .filter(|x| x.file_name().unwrap().to_str().unwrap().ends_with(".sql"))
                     .filter(|x| {
-                        file_modified_time_in_millis(
-                            &(get_current_working_dir()
-                                + "/migrust/migrations/"
-                                + x.file_name().unwrap().to_str().unwrap()),
-                        ) > config.time
+                        x.file_name().unwrap().to_str().unwrap().split(".").next().unwrap().parse::<u128>().unwrap() > config.time
                     })
                     .collect();
             if sql_files.len() <= 0 {
@@ -217,11 +224,7 @@ fn main() {
                     .map(|x| x.map(|entry| entry.path()).unwrap())
                     .filter(|x| x.file_name().unwrap().to_str().unwrap().ends_with(".sql"))
                     .filter(|x| {
-                        file_modified_time_in_millis(
-                            &(get_current_working_dir()
-                                + "/migrust/migrations/"
-                                + x.file_name().unwrap().to_str().unwrap()),
-                        ) > config.time
+                        x.file_name().unwrap().to_str().unwrap().split(".").next().unwrap().parse::<u128>().unwrap() > config.time
                     })
                     .collect();
             if sql_files.len() <= 0 {
@@ -301,11 +304,7 @@ fn main() {
                         + &project_config.id
                         + ".json"),
                     serde_json::to_string_pretty(&Config {
-                        time: file_modified_time_in_millis(
-                            &(get_current_working_dir()
-                                + "/migrust/migrations/"
-                                + x.file_name().unwrap().to_str().unwrap()),
-                        ),
+                        time: x.file_name().unwrap().to_str().unwrap().split(".").next().unwrap().parse::<u128>().unwrap(),
                     })
                     .unwrap(),
                 );
