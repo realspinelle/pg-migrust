@@ -119,7 +119,7 @@ fn main() {
     };
     match args {
         Args::Create(_) => {
-            if is_project_folder_inited() {
+            if !is_project_folder_inited() {
                 return println!("This folder is not inited");
             } else {
                 let filename = SystemTime::now()
